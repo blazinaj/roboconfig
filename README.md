@@ -2,7 +2,7 @@
 
 RoboConfig is a modern web application for managing and assessing robotics systems, components, and their associated risks. It provides a comprehensive solution for robotics engineers and manufacturers to configure machines, track maintenance, and perform risk assessments.
 
-🔗 **[Live Demo](https://roboconfig.netlify.app)** | [Documentation](https://docs.roboconfig.com)
+🔗 **[Live Demo](https://peaceful-paprenjak-ef7cfd.netlify.app/)**
 
 ## Features
 
