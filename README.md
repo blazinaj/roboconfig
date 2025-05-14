@@ -4,6 +4,34 @@ RoboConfig is a modern web application for managing and assessing robotics syste
 
 🔗 **[Live Demo](https://roboconfig.netlify.app)** | [Documentation](https://docs.roboconfig.com)
 
+## AI-Generated Prototype
+
+This application is a prototype generated using advanced AI technology. It serves as a demonstration of how AI can assist in creating complex web applications with industry-standard architecture and best practices. While the code is production-ready in terms of structure and quality, please note:
+
+- This is a prototype and should be thoroughly tested before production use
+- The application demonstrates AI's capability to generate maintainable, scalable code
+- Security measures and best practices are implemented but should be reviewed
+- The codebase follows modern development standards and patterns
+
+## Current Development Status
+
+The application is currently in active development with the following features implemented:
+
+✅ **Completed Features**:
+- User authentication with Supabase
+- Component management system
+- Machine configuration interface
+- Risk assessment tools
+- Maintenance scheduling
+- Basic reporting functionality
+- Stripe integration for subscriptions
+
+🚧 **In Progress**:
+- Advanced reporting features
+- Real-time collaboration tools
+- API documentation
+- Integration testing
+
 ## Features
 
 - 🤖 **Machine Management**: Create and manage robotic systems with detailed configurations
@@ -102,21 +130,9 @@ roboconfig/
 - Completion tracking
 - Maintenance history
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact our support team at support@roboconfig.com.
-
-## Security
-
-Please report any security vulnerabilities to security@roboconfig.com.
 
 ## Acknowledgments
 
