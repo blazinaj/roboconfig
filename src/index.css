@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch-friendly styles for better mobile experience */
+@media (max-width: 768px) {
+  button, 
+  [role="button"], 
+  .cursor-pointer, 
+  a {
+    @apply min-h-[36px] min-w-[36px];
+  }
+  
+  input, 
+  select, 
+  textarea {
+    @apply text-base;
+  }
+}
+
+/* Helper to ensure main content flows properly */
+.main-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Fix for footer alignment */
+footer {
+  margin-top: auto;
+}
