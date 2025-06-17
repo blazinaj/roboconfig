@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Component } from '../types';
-import { AlertTriangle, CheckCircle, Info, X, Edit2, DollarSign } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Info, X, Edit2, DollarSign, Package } from 'lucide-react';
 import DriveForm from './ComponentForms/DriveForm';
 import ControllerForm from './ComponentForms/ControllerForm';
 import PowerForm from './ComponentForms/PowerForm';
@@ -10,6 +10,7 @@ import ManipulationForm from './ComponentForms/ManipulationForm';
 import SensorsForm from './ComponentForms/SensorsForm';
 import ChassisForm from './ComponentForms/ChassisForm';
 import PriceEstimation from './PriceEstimation';
+import ComponentInventorySection from './ComponentInventorySection';
 
 interface ComponentDetailsProps {
   component: Component;
@@ -19,7 +20,7 @@ interface ComponentDetailsProps {
 
 const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component, onClose, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'pricing' | 'risks'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'pricing' | 'risks' | 'inventory'>('details');
 
   const calculateRiskLevel = () => {
     if (!component.riskFactors || component.riskFactors.length === 0) {
@@ -158,6 +159,17 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component, onClose,
             >
               {getRiskIcon()}
               <span className="ml-1">Risk Analysis</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('inventory')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center ${
+                activeTab === 'inventory' 
+                  ? 'border-blue-500 text-blue-600' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Package size={16} className="mr-1" />
+              <span className="ml-1">Inventory</span>
             </button>
           </div>
         </div>
@@ -304,6 +316,10 @@ const ComponentDetails: React.FC<ComponentDetailsProps> = ({ component, onClose,
                 </div>
               </div>
             </div>
+          )}
+
+          {activeTab === 'inventory' && (
+            <ComponentInventorySection component={component} />
           )}
         </div>
       </div>

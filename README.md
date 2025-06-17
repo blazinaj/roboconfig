@@ -10,7 +10,7 @@
 
 RoboConfig is a modern web application for managing and assessing robotics systems, components, and their associated risks. It provides a comprehensive solution for robotics engineers and manufacturers to configure machines, track maintenance, and perform risk assessments.
 
-🔗 **[Live Demo](https://roboconfig.com)**
+🔗 **[Live Demo](https://roboconfig.netlify.app)**
 
 ## Features
 
@@ -18,28 +18,32 @@ RoboConfig is a modern web application for managing and assessing robotics syste
 - 🔧 **Component Library**: Extensive library of robotics components with specifications
 - 🛡️ **Risk Assessment**: Built-in risk assessment tools for components and systems
 - 📊 **Maintenance Tracking**: Schedule and monitor maintenance tasks
+- 📦 **Inventory Management**: Track component stock levels, suppliers, and purchase orders
 - 🤝 **Organization Management**: Create and manage organizations with team members
-- 🧠 **AI Assistance**: AI-powered configuration assistants for machines and components
+- 🧠 **AI Assistance**: AI-powered assistants for configuration, risk assessment, and inventory
 - 📱 **Responsive Design**: Full mobile and desktop support
 - 🔐 **Secure Authentication**: Email/password and Google OAuth authentication with Supabase
+- 💳 **Subscription Management**: Premium features with Stripe integration
 
 ## Current Development Status
 
 The application is deployed and ready to use with the following features implemented:
 
-✅ **Features**:
+✅ **Completed Features**:
 - User authentication with Supabase (Email/Password and Google OAuth)
 - Multi-organization support with team management
 - Component management system with AI-assisted configuration
 - Machine configuration interface with drag-and-drop component ordering
 - Risk assessment tools with severity and probability tracking
 - Maintenance scheduling and task management
+- Inventory management with stock level tracking
+- Supplier management and purchase order processing
 - PDF report generation
-- AI assistants for machine configuration and component selection
+- Stripe integration for subscriptions
+- AI assistants for machine configuration, component selection, and inventory management
 - Real-time database updates
 - Mobile-responsive design
 - Organization invitations and member management
-- Component Price Estimations
 
 ## AI Assistants
 
@@ -57,7 +61,14 @@ RoboConfig features powerful AI assistants that transform how robotics engineers
   - Assists with compatibility considerations
   - Offers real-world parameter recommendations (voltage, torque, dimensions, etc.)
 
-- **Context-Aware Suggestions**: Both assistants understand your current configuration
+- **Inventory Management Assistant**: Optimizes stock management and procurement
+  - Analyzes current inventory health and identifies critical shortages
+  - Recommends optimal minimum stock levels based on usage patterns
+  - Generates purchase order suggestions for restocking
+  - Identifies high-turnover components and usage trends
+  - Provides supplier recommendations for efficient procurement
+
+- **Context-Aware Suggestions**: All assistants understand your current configuration
   - Leverages existing components in your organization when possible
   - Identifies potential issues in current configurations
   - Provides upgrade and optimization recommendations
@@ -73,6 +84,7 @@ RoboConfig features powerful AI assistants that transform how robotics engineers
   - React Router for navigation
   - React PDF for report generation
   - React Beautiful DnD for drag-and-drop functionality
+  - Chart.js for analytics visualization
 
 - **Backend**:
   - Supabase for database and authentication
@@ -123,6 +135,7 @@ roboconfig/
 │   ├── components/     # React components
 │   │   ├── Auth/       # Authentication components
 │   │   ├── ComponentForms/ # Forms for different component types
+│   │   ├── Inventory/  # Inventory management components
 │   │   ├── Layout/     # Layout components
 │   │   ├── MachineForm/ # Machine creation/editing
 │   │   ├── Reports/    # Report generation
@@ -131,6 +144,9 @@ roboconfig/
 │   ├── hooks/          # Custom React hooks
 │   ├── lib/            # Utility functions and configurations
 │   ├── pages/          # Page components
+│   │   ├── Auth/       # Authentication pages
+│   │   ├── ComponentTypes/ # Component type pages
+│   │   └── Inventory/  # Inventory management pages
 │   └── types/          # TypeScript type definitions
 ├── supabase/
 │   ├── functions/      # Edge Functions
@@ -164,11 +180,23 @@ roboconfig/
 - Completion tracking
 - Maintenance history
 
+### Inventory Management
+- Component stock level tracking
+- Minimum quantity thresholds with low stock alerts
+- Supplier information management
+- Purchase order creation and tracking
+- Inventory analytics and insights
+- AI-assisted inventory optimization
+
 ### Organization Management
 - Create and manage multiple organizations
 - Invite team members
 - Role-based permissions (Owner, Admin, Member)
 - Organization-specific data isolation
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
@@ -176,3 +204,4 @@ roboconfig/
 - [Stripe](https://stripe.com) for payment processing
 - [OpenAI](https://openai.com) for AI assistance capabilities
 - [Lucide](https://lucide.dev) for beautiful icons
+- All our contributors and users

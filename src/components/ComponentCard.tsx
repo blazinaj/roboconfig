@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Component } from '../types';
-import { ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { useInventory } from '../hooks/useInventory';
+import { ChevronDown, ChevronUp, AlertTriangle, CheckCircle, Info, Package, AlertCircle } from 'lucide-react';
 
 interface ComponentCardProps {
   component: Component;
@@ -9,6 +10,10 @@ interface ComponentCardProps {
 
 const ComponentCard: React.FC<ComponentCardProps> = ({ component, onSelect }) => {
   const [expanded, setExpanded] = useState(false);
+  const { inventoryStatus } = useInventory();
+  
+  // Find inventory data for this component
+  const inventoryData = inventoryStatus.find(item => item.component_id === component.id);
   
   const toggleExpand = () => {
     setExpanded(!expanded);
@@ -35,6 +40,34 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ component, onSelect }) =>
     medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     high: 'bg-red-100 text-red-800 border-red-200',
   }[riskLevel];
+
+  // Get stock status badge
+  const getStockBadge = () => {
+    if (!inventoryData) return null;
+    
+    if (inventoryData.quantity === 0) {
+      return (
+        <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 flex items-center ml-2">
+          <AlertCircle size={12} className="inline mr-1" />
+          Out of Stock
+        </span>
+      );
+    } else if (inventoryData.quantity <= inventoryData.minimum_quantity) {
+      return (
+        <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 flex items-center ml-2">
+          <AlertTriangle size={12} className="inline mr-1" />
+          Low Stock
+        </span>
+      );
+    } else {
+      return (
+        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 flex items-center ml-2">
+          <CheckCircle size={12} className="inline mr-1" />
+          In Stock
+        </span>
+      );
+    }
+  };
   
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -63,6 +96,13 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ component, onSelect }) =>
             <span className="mx-2">•</span>
             <span>{component.type}</span>
           </div>
+          {inventoryData && (
+            <div className="flex items-center text-sm">
+              <Package size={14} className="mr-1 text-gray-500" />
+              <span className="font-medium">{inventoryData.quantity}</span>
+              {getStockBadge()}
+            </div>
+          )}
         </div>
         <p className="mt-2 text-sm text-gray-600">{component.description}</p>
       </div>
@@ -99,6 +139,47 @@ const ComponentCard: React.FC<ComponentCardProps> = ({ component, onSelect }) =>
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+          
+          {inventoryData && (
+            <div className="mb-3">
+              <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                <Package size={14} className="mr-1 text-gray-600" />
+                Inventory Status
+              </h4>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="text-gray-600">In Stock:</span>
+                  <span className="float-right font-medium text-gray-800">
+                    {inventoryData.quantity}
+                  </span>
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="text-gray-600">Min. Quantity:</span>
+                  <span className="float-right font-medium text-gray-800">
+                    {inventoryData.minimum_quantity}
+                  </span>
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="text-gray-600">Location:</span>
+                  <span className="float-right font-medium text-gray-800">
+                    {inventoryData.location || "—"}
+                  </span>
+                </div>
+                <div className="bg-white p-2 rounded border border-gray-200">
+                  <span className="text-gray-600">Status:</span>
+                  <span className="float-right">
+                    {inventoryData.quantity === 0 ? (
+                      <span className="text-red-600 font-medium">Out of Stock</span>
+                    ) : inventoryData.quantity <= inventoryData.minimum_quantity ? (
+                      <span className="text-yellow-600 font-medium">Low Stock</span>
+                    ) : (
+                      <span className="text-green-600 font-medium">In Stock</span>
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
           )}

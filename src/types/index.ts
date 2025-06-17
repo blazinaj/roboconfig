@@ -1,6 +1,7 @@
 export * from './componentTypes';
 export * from './machineTypes';
 export * from './organizationTypes';
+export * from './inventoryTypes';
 
 // Legacy types that may still be used elsewhere in the application
 export type Project = {

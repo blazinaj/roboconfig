@@ -1,6 +1,7 @@
 import React from 'react';
 import { Component } from '../../types';
-import { AlertTriangle, CheckCircle, Info, Eye } from 'lucide-react';
+import { useInventory } from '../../hooks/useInventory';
+import { AlertTriangle, CheckCircle, Info, Eye, Package, AlertCircle } from 'lucide-react';
 
 interface ComponentListItemProps {
   component: Component;
@@ -8,6 +9,11 @@ interface ComponentListItemProps {
 }
 
 const ComponentListItem: React.FC<ComponentListItemProps> = ({ component, onSelect }) => {
+  const { inventoryStatus } = useInventory();
+  
+  // Find inventory data for this component
+  const inventoryData = inventoryStatus.find(item => item.component_id === component.id);
+  
   // Calculate risk level
   const calculateRiskLevel = () => {
     if (!component.riskFactors || component.riskFactors.length === 0) {
@@ -74,6 +80,34 @@ const ComponentListItem: React.FC<ComponentListItemProps> = ({ component, onSele
   
   const keySpecs = getKeySpecs();
   
+  // Get stock status badge
+  const getStockBadge = () => {
+    if (!inventoryData) return null;
+    
+    if (inventoryData.quantity === 0) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 ml-2">
+          <AlertCircle size={12} className="mr-1" />
+          Out of Stock
+        </span>
+      );
+    } else if (inventoryData.quantity <= inventoryData.minimum_quantity) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 ml-2">
+          <AlertTriangle size={12} className="mr-1" />
+          Low Stock ({inventoryData.quantity})
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 ml-2">
+          <CheckCircle size={12} className="mr-1" />
+          In Stock ({inventoryData.quantity})
+        </span>
+      );
+    }
+  };
+  
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-4 flex justify-between cursor-pointer" onClick={() => onSelect(component)}>
@@ -90,6 +124,7 @@ const ComponentListItem: React.FC<ComponentListItemProps> = ({ component, onSele
             <span className="text-xs uppercase font-semibold bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{component.category}</span>
             <span className="mx-2 text-gray-400">•</span>
             <span className="text-sm text-gray-600">{component.type}</span>
+            {inventoryData && getStockBadge()}
           </div>
           
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">{component.description}</p>
@@ -101,6 +136,14 @@ const ComponentListItem: React.FC<ComponentListItemProps> = ({ component, onSele
                 <span className="ml-1 text-gray-800">{value}</span>
               </span>
             ))}
+            
+            {inventoryData && (
+              <span className="inline-flex items-center text-xs bg-gray-50 border border-gray-200 rounded px-2 py-1">
+                <Package size={12} className="text-gray-500 mr-1" />
+                <span className="font-medium text-gray-600">Stock:</span>
+                <span className="ml-1 text-gray-800">{inventoryData.quantity}</span>
+              </span>
+            )}
           </div>
         </div>
         

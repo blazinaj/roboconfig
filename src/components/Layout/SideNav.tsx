@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { 
-  Cog, Cpu, Battery, MessageSquare, Code, Hand, Eye, Package, 
-  FileText, Home, Settings, Notebook as Robot,
-  HelpCircle, Bell, Menu, X, Building
-} from 'lucide-react';
+import { Cog, Cpu, Battery, MessageSquare, Code, Hand, Eye, Package, FileText, Home, Settings, Notebook as Robot, Warehouse, HelpCircle, Bell, Menu, X, Building, ShoppingCart, Truck, BarChart3 } from 'lucide-react';
 import { OrganizationSelector } from './OrganizationSelector';
 import { UserMenu } from './UserMenu';
 
@@ -153,6 +149,45 @@ const SideNav: React.FC = () => {
                 <span className="ml-2 text-sm">{item.label}</span>
               </NavLink>
             ))}
+          </div>
+
+          <div className="px-4 py-2 mt-6">
+            <h3 className="text-xs uppercase text-gray-500 font-semibold">Inventory</h3>
+          </div>
+          
+          <div className="space-y-1 px-3">
+            <NavLink
+              to="/inventory"
+              className={({ isActive }) => getLinkClass(isActive)}
+              onClick={() => setIsOpen(false)}
+            >
+              <Warehouse size={20} className="flex-shrink-0 text-amber-400" />
+              <span className="ml-2 text-sm">Stock Management</span>
+            </NavLink>
+            <NavLink
+              to="/inventory/suppliers"
+              className={({ isActive }) => getLinkClass(isActive)}
+              onClick={() => setIsOpen(false)}
+            >
+              <Truck size={20} className="flex-shrink-0 text-green-400" />
+              <span className="ml-2 text-sm">Suppliers</span>
+            </NavLink>
+            <NavLink
+              to="/inventory/purchase-orders"
+              className={({ isActive }) => getLinkClass(isActive)}
+              onClick={() => setIsOpen(false)}
+            >
+              <ShoppingCart size={20} className="flex-shrink-0 text-blue-400" />
+              <span className="ml-2 text-sm">Purchase Orders</span>
+            </NavLink>
+            <NavLink
+              to="/inventory/analytics"
+              className={({ isActive }) => getLinkClass(isActive)}
+              onClick={() => setIsOpen(false)}
+            >
+              <BarChart3 size={20} className="flex-shrink-0 text-purple-400" />
+              <span className="ml-2 text-sm">Inventory Analytics</span>
+            </NavLink>
           </div>
           
           <div className="px-4 py-2 mt-6">

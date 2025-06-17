@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Activity, Settings, PenTool as Tool, AlertTriangle } from 'lucide-react';
+import { Activity, Settings, PenTool as Tool, AlertTriangle, Share2, Package } from 'lucide-react';
 import { Machine, MaintenanceTask } from '../../../types';
 import MachineComponents from './MachineComponents';
 import MaintenanceSchedule from './MaintenanceSchedule';
 import RiskAssessment from './RiskAssessment';
+import ComponentDiagram from './ComponentDiagram';
+import MachineInventory from './MachineInventory';
 
 interface MachineTabViewProps {
   machine: Machine;
@@ -15,7 +17,7 @@ interface MachineTabViewProps {
   handleAddTask: (task: Partial<MaintenanceTask>) => void;
 }
 
-type TabType = 'overview' | 'components' | 'maintenance' | 'risks';
+type TabType = 'overview' | 'components' | 'maintenance' | 'risks' | 'diagram' | 'inventory';
 
 const MachineTabView: React.FC<MachineTabViewProps> = ({
   machine,
@@ -30,10 +32,10 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 overflow-x-auto hide-scrollbar">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center ${
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
             activeTab === 'overview'
               ? 'border-blue-500 text-blue-600 bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -44,7 +46,7 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('components')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center ${
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
             activeTab === 'components'
               ? 'border-blue-500 text-blue-600 bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -54,8 +56,19 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
           Components
         </button>
         <button
+          onClick={() => setActiveTab('diagram')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
+            activeTab === 'diagram'
+              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <Share2 size={16} className="mr-2" />
+          Component Diagram
+        </button>
+        <button
           onClick={() => setActiveTab('maintenance')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center ${
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
             activeTab === 'maintenance'
               ? 'border-blue-500 text-blue-600 bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -66,7 +79,7 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('risks')}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center ${
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
             activeTab === 'risks'
               ? 'border-blue-500 text-blue-600 bg-blue-50'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -74,6 +87,17 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
         >
           <AlertTriangle size={16} className="mr-2" />
           Risks
+        </button>
+        <button
+          onClick={() => setActiveTab('inventory')}
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
+            activeTab === 'inventory'
+              ? 'border-blue-500 text-blue-600 bg-blue-50'
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          }`}
+        >
+          <Package size={16} className="mr-2" />
+          Inventory
         </button>
       </div>
       
@@ -187,6 +211,31 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
                 </p>
               </div>
             </div>
+            
+            {/* Brief inventory summary */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex justify-between mb-3">
+                <h4 className="font-medium text-gray-700">Inventory</h4>
+                <button 
+                  onClick={() => setActiveTab('inventory')}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Manage Inventory
+                </button>
+              </div>
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  Manage component inventory allocation for this machine.
+                </p>
+                <button
+                  onClick={() => setActiveTab('inventory')}
+                  className="mt-2 text-xs bg-blue-600 text-white px-2 py-1 rounded inline-flex items-center"
+                >
+                  <Package size={12} className="mr-1" />
+                  Allocate Inventory
+                </button>
+              </div>
+            </div>
           </div>
         )}
         
@@ -197,6 +246,10 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
             isEditing={isEditing}
             handleRemoveComponent={handleRemoveComponent}
           />
+        )}
+        
+        {activeTab === 'diagram' && (
+          <ComponentDiagram machine={machine} />
         )}
         
         {activeTab === 'maintenance' && machine.maintenanceSchedule && (
@@ -212,6 +265,14 @@ const MachineTabView: React.FC<MachineTabViewProps> = ({
         
         {activeTab === 'risks' && (
           <RiskAssessment 
+            machine={machine}
+            updatedMachine={updatedMachine}
+            isEditing={isEditing}
+          />
+        )}
+        
+        {activeTab === 'inventory' && (
+          <MachineInventory 
             machine={machine}
             updatedMachine={updatedMachine}
             isEditing={isEditing}

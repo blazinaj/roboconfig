@@ -1,15 +1,17 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, AlertTriangle, CheckCircle, Info, Notebook as Robot, Cog, Package, Gauge, ArrowRight, Plus, FileText } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle, Info, Notebook as Robot, Cog, Package, Gauge, ArrowRight, Plus, FileText, Warehouse, Truck as TruckLoading, ShoppingCart, AlertCircle } from 'lucide-react';
 import { useOrganization } from '../context/OrganizationContext';
 import { useMachines } from '../hooks/useMachines';
 import { useComponents } from '../hooks/useComponents';
+import { useInventory } from '../hooks/useInventory';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { currentOrganization } = useOrganization();
   const { machines, loading: machinesLoading, error: machinesError } = useMachines();
   const { components, loading: componentsLoading, error: componentsError } = useComponents();
+  const { inventoryStatus, loading: inventoryLoading, error: inventoryError } = useInventory();
 
   // Calculate statistics for overview cards
   const stats = useMemo(() => {
@@ -51,12 +53,22 @@ const Dashboard: React.FC = () => {
       return acc;
     }, { total: 0, high: 0, medium: 0, low: 0 });
     
+    // Calculate inventory stats
+    const inventoryStats = {
+      total: inventoryStatus.length,
+      healthy: inventoryStatus.filter(item => item.quantity > item.minimum_quantity).length,
+      low: inventoryStatus.filter(item => item.quantity <= item.minimum_quantity && item.quantity > 0).length,
+      out: inventoryStatus.filter(item => item.quantity === 0).length,
+      value: inventoryStatus.reduce((total, item) => total + (item.quantity * (item.unit_cost || 0)), 0)
+    };
+    
     return {
       machines: machineStats,
       components: componentRiskCounts,
-      risks: riskCounts
+      risks: riskCounts,
+      inventory: inventoryStats
     };
-  }, [machines, components]);
+  }, [machines, components, inventoryStatus]);
 
   // Get recent machines
   const recentMachines = useMemo(() => {
@@ -106,6 +118,22 @@ const Dashboard: React.FC = () => {
         severity: item.severity
       }));
   }, [components]);
+
+  // Get low stock items
+  const lowStockItems = useMemo(() => {
+    return inventoryStatus
+      .filter(item => item.quantity <= item.minimum_quantity)
+      .sort((a, b) => a.quantity - b.quantity)
+      .slice(0, 3)
+      .map(item => ({
+        id: item.inventory_id,
+        componentId: item.component_id,
+        name: item.component_name,
+        quantity: item.quantity,
+        minimum: item.minimum_quantity,
+        category: item.category
+      }));
+  }, [inventoryStatus]);
 
   // Helper function to calculate machine risk level
   function calculateMachineRiskLevel(machine) {
@@ -164,6 +192,13 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
   const handleComponentClick = (category: string, id: string) => {
     const categoryRoutes: Record<string, string> = {
       'Drive': '/components/drive',
@@ -200,11 +235,11 @@ const Dashboard: React.FC = () => {
   }
 
   // Loading state
-  if (machinesLoading || componentsLoading) {
+  if (machinesLoading || componentsLoading || inventoryLoading) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3, 4].map(i => (
             <div key={i} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
@@ -226,7 +261,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {[1, 2].map(i => (
+          {[1, 2, 3].map(i => (
             <div key={i} className="bg-white rounded-lg shadow-md border border-gray-200">
               <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <div className="h-5 bg-gray-200 rounded w-32"></div>
@@ -248,7 +283,7 @@ const Dashboard: React.FC = () => {
   }
 
   // Error state
-  if (machinesError || componentsError) {
+  if (machinesError || componentsError || inventoryError) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -256,7 +291,7 @@ const Dashboard: React.FC = () => {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Dashboard</h2>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          {machinesError || componentsError}
+          {machinesError || componentsError || inventoryError}
         </p>
         <button
           onClick={() => window.location.reload()}
@@ -272,7 +307,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Machines Overview */}
         <div 
           onClick={() => navigate('/machines')}
@@ -333,6 +368,36 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Inventory Overview */}
+        <div 
+          onClick={() => navigate('/inventory')}
+          className="bg-white rounded-lg shadow-md p-6 border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <Warehouse className="h-6 w-6 text-amber-600" />
+              </div>
+              <h3 className="ml-3 text-lg font-semibold text-gray-900">Inventory</h3>
+            </div>
+            <span className="text-2xl font-bold text-gray-900">{stats.inventory.total}</span>
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Value</span>
+              <span className="font-medium text-gray-900">{formatCurrency(stats.inventory.value)}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Low Stock</span>
+              <span className="font-medium text-yellow-600">{stats.inventory.low}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Out of Stock</span>
+              <span className="font-medium text-red-600">{stats.inventory.out}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Reports Overview */}
         <div 
           onClick={() => navigate('/reports')}
@@ -340,8 +405,8 @@ const Dashboard: React.FC = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <ShieldCheck className="h-6 w-6 text-amber-600" />
+              <div className="p-2 bg-green-100 rounded-lg">
+                <ShieldCheck className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="ml-3 text-lg font-semibold text-gray-900">Reports</h3>
             </div>
@@ -412,6 +477,59 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Low Stock Items */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-900">Low Stock Items</h3>
+            <button 
+              onClick={() => navigate('/inventory')}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+            >
+              View All <ArrowRight size={16} className="ml-1" />
+            </button>
+          </div>
+          <div className="p-4 sm:p-6">
+            <div className="space-y-4">
+              {lowStockItems.length > 0 ? (
+                lowStockItems.map((item) => (
+                  <div 
+                    key={item.id}
+                    onClick={() => navigate('/inventory')}
+                    className="flex items-center justify-between cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  >
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
+                      <div className="flex items-center mt-1">
+                        <span className="bg-gray-100 px-2 py-0.5 rounded text-xs text-gray-700">{item.category}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-gray-900">{item.quantity} in stock</div>
+                      <div className="text-xs text-yellow-600">
+                        Min level: {item.minimum}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-gray-500">
+                  All items are sufficiently stocked
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => navigate('/inventory/purchase-orders')}
+              className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+            >
+              <ShoppingCart size={16} className="mr-2" />
+              Create Purchase Order
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Critical Components & Recent Suppliers */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Critical Components */}
         <div className="bg-white rounded-lg shadow-md border border-gray-200">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -457,6 +575,63 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* Inventory Summary */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-900">Inventory Summary</h3>
+            <button 
+              onClick={() => navigate('/inventory/analytics')}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+            >
+              View Analytics <ArrowRight size={16} className="ml-1" />
+            </button>
+          </div>
+          <div className="p-4 sm:p-6">
+            <div className="mb-4">
+              <h4 className="text-base font-medium text-gray-800 mb-3">Total Inventory Value</h4>
+              <div className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                <span className="text-gray-600">Current Value</span>
+                <span className="text-xl font-bold text-gray-900">{formatCurrency(stats.inventory.value)}</span>
+              </div>
+            </div>
+            
+            <h4 className="text-base font-medium text-gray-800 mb-3">Stock Status</h4>
+            <div className="space-y-3">
+              <div className="bg-green-50 p-3 rounded-lg flex justify-between items-center">
+                <span className="flex items-center text-green-800">
+                  <CheckCircle size={16} className="mr-2" />
+                  Healthy Stock
+                </span>
+                <span className="font-medium text-green-700">{stats.inventory.healthy} items</span>
+              </div>
+              
+              <div className="bg-yellow-50 p-3 rounded-lg flex justify-between items-center">
+                <span className="flex items-center text-yellow-800">
+                  <AlertTriangle size={16} className="mr-2" />
+                  Low Stock
+                </span>
+                <span className="font-medium text-yellow-700">{stats.inventory.low} items</span>
+              </div>
+              
+              <div className="bg-red-50 p-3 rounded-lg flex justify-between items-center">
+                <span className="flex items-center text-red-800">
+                  <AlertCircle size={16} className="mr-2" />
+                  Out of Stock
+                </span>
+                <span className="font-medium text-red-700">{stats.inventory.out} items</span>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => navigate('/inventory')}
+              className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+            >
+              <Warehouse size={16} className="mr-2" />
+              Manage Inventory
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -465,7 +640,7 @@ const Dashboard: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <button
               onClick={() => navigate('/machines')}
               className="p-4 bg-blue-50 rounded-lg text-left hover:bg-blue-100 transition-colors"
@@ -485,12 +660,21 @@ const Dashboard: React.FC = () => {
             </button>
             
             <button
-              onClick={() => navigate('/reports')}
+              onClick={() => navigate('/inventory/purchase-orders')}
               className="p-4 bg-amber-50 rounded-lg text-left hover:bg-amber-100 transition-colors"
             >
-              <FileText className="h-6 w-6 text-amber-600 mb-2" />
-              <h4 className="font-medium text-gray-900">View Reports</h4>
-              <p className="text-sm text-gray-600 mt-1">Access system reports and analytics</p>
+              <ShoppingCart className="h-6 w-6 text-amber-600 mb-2" />
+              <h4 className="font-medium text-gray-900">Create Order</h4>
+              <p className="text-sm text-gray-600 mt-1">Order new components from suppliers</p>
+            </button>
+            
+            <button
+              onClick={() => navigate('/inventory/suppliers')}
+              className="p-4 bg-green-50 rounded-lg text-left hover:bg-green-100 transition-colors"
+            >
+              <TruckLoading className="h-6 w-6 text-green-600 mb-2" />
+              <h4 className="font-medium text-gray-900">Manage Suppliers</h4>
+              <p className="text-sm text-gray-600 mt-1">Add and update component suppliers</p>
             </button>
           </div>
         </div>

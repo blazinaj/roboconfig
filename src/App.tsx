@@ -16,6 +16,11 @@ import SoftwarePage from './pages/ComponentTypes/SoftwarePage';
 import ManipulationPage from './pages/ComponentTypes/ManipulationPage';
 import SensorsPage from './pages/ComponentTypes/SensorsPage';
 import ChassisPage from './pages/ComponentTypes/ChassisPage';
+import InventoryPage from './pages/Inventory/InventoryPage';
+import SuppliersPage from './pages/Inventory/SuppliersPage';
+import PurchaseOrdersPage from './pages/Inventory/PurchaseOrdersPage';
+import PurchaseOrderDetailsPage from './pages/Inventory/PurchaseOrderDetailsPage';
+import InventoryAnalyticsPage from './pages/Inventory/InventoryAnalyticsPage';
 import OrganizationsPage from './pages/OrganizationsPage';
 import OrganizationSettingsPage from './pages/OrganizationSettingsPage';
 import AcceptInvitePage from './pages/AcceptInvitePage';
@@ -53,6 +58,11 @@ function App() {
               <Route path="/machines/:id" element={<ProtectedRoute><MachineDetailsPage /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
               <Route path="/configuration" element={<ProtectedRoute><ConfigurationPage /></ProtectedRoute>} />
+              <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
+              <Route path="/inventory/suppliers" element={<ProtectedRoute><SuppliersPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders" element={<ProtectedRoute><PurchaseOrdersPage /></ProtectedRoute>} />
+              <Route path="/inventory/purchase-orders/:id" element={<ProtectedRoute><PurchaseOrderDetailsPage /></ProtectedRoute>} />
+              <Route path="/inventory/analytics" element={<ProtectedRoute><InventoryAnalyticsPage /></ProtectedRoute>} />
               <Route path="/organizations" element={<ProtectedRoute><OrganizationsPage /></ProtectedRoute>} />
               <Route path="/organizations/:id/settings" element={<ProtectedRoute><OrganizationSettingsPage /></ProtectedRoute>} />
             </Routes>

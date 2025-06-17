@@ -4,6 +4,7 @@ import { Plus, Search, Loader2, AlertTriangle, Bot, Grid, List } from 'lucide-re
 import ComponentCard from './ComponentCard';
 import ComponentListItem from './ComponentListItem';
 import AIComponentListAssistant from './AIComponentListAssistant';
+import AddToInventoryButton from '../../components/ComponentIntegration/AddToInventoryButton';
 
 interface ComponentListLayoutProps {
   title: string;
@@ -39,6 +40,8 @@ const ComponentListLayout: React.FC<ComponentListLayoutProps> = ({
   error
 }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedComponent, setLocalSelectedComponent] = useState<Component | null>(null);
+  const [showInventoryForm, setShowInventoryForm] = useState(false);
 
   if (loading) {
     return (
@@ -142,7 +145,10 @@ const ComponentListLayout: React.FC<ComponentListLayoutProps> = ({
                   <ComponentCard
                     key={component.id}
                     component={component}
-                    onSelect={setSelectedComponent}
+                    onSelect={(component) => {
+                      setLocalSelectedComponent(component);
+                      setSelectedComponent(component);
+                    }}
                   />
                 ))}
               </div>
@@ -152,7 +158,10 @@ const ComponentListLayout: React.FC<ComponentListLayoutProps> = ({
                   <ComponentListItem
                     key={component.id}
                     component={component}
-                    onSelect={setSelectedComponent}
+                    onSelect={(component) => {
+                      setLocalSelectedComponent(component);
+                      setSelectedComponent(component);
+                    }}
                   />
                 ))}
               </div>
@@ -176,21 +185,33 @@ const ComponentListLayout: React.FC<ComponentListLayoutProps> = ({
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredComponents.map((component) => (
-                <ComponentCard
-                  key={component.id}
-                  component={component}
-                  onSelect={setSelectedComponent}
-                />
+                <div key={component.id} className="space-y-2">
+                  <ComponentCard
+                    component={component}
+                    onSelect={(component) => {
+                      setLocalSelectedComponent(component);
+                      setSelectedComponent(component);
+                    }}
+                  />
+                  <AddToInventoryButton component={component} fullWidth />
+                </div>
               ))}
             </div>
           ) : (
             <div className="space-y-3">
               {filteredComponents.map((component) => (
-                <ComponentListItem
-                  key={component.id}
-                  component={component}
-                  onSelect={setSelectedComponent}
-                />
+                <div key={component.id} className="flex flex-col">
+                  <ComponentListItem
+                    component={component}
+                    onSelect={(component) => {
+                      setLocalSelectedComponent(component);
+                      setSelectedComponent(component);
+                    }}
+                  />
+                  <div className="ml-auto -mt-3 mb-2 mr-2 z-10">
+                    <AddToInventoryButton component={component} size="sm" />
+                  </div>
+                </div>
               ))}
             </div>
           )}

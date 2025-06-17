@@ -31,7 +31,7 @@ const MachineMetricsCard: React.FC<MachineMetricsCardProps> = ({
             {performance.level}
           </div>
         </div>
-        <div className="text-xl font-bold text-gray-900">{performance.score}<span className="text-sm">/100</span></div>
+        <div className="text-xl font-bold text-gray-900">{Math.round(performance.score)}<span className="text-sm">/100</span></div>
         <div className="text-xs text-blue-800">Performance Score</div>
       </div>
       
@@ -44,7 +44,7 @@ const MachineMetricsCard: React.FC<MachineMetricsCardProps> = ({
             {reliability.level}
           </div>
         </div>
-        <div className="text-xl font-bold text-gray-900">{reliability.score}<span className="text-sm">/100</span></div>
+        <div className="text-xl font-bold text-gray-900">{Math.round(reliability.score)}<span className="text-sm">/100</span></div>
         <div className="text-xs text-green-800">Reliability Score</div>
       </div>
       
@@ -57,7 +57,7 @@ const MachineMetricsCard: React.FC<MachineMetricsCardProps> = ({
             {efficiency.level}
           </div>
         </div>
-        <div className="text-xl font-bold text-gray-900">{efficiency.score}<span className="text-sm">/100</span></div>
+        <div className="text-xl font-bold text-gray-900">{Math.round(efficiency.score)}<span className="text-sm">/100</span></div>
         <div className="text-xs text-yellow-800">Efficiency Score</div>
       </div>
       
